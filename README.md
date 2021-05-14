@@ -1,7 +1,7 @@
 # hustler-mob-api
 
 This is the backend part (REST API) developed with PlayFramework of a system which will allow a person whatever their position to request any kind of service (Mechanics, Electricity, Plumbing,…) if necessary. Agents who offer these services will also be able to make service offers.
-This is a starter application that shows how Play works.  Please see the documentation at https://www.playframework.com/documentation/latest/Home for more details.
+Please see the documentation at https://www.playframework.com/documentation/latest/Home for more details.
 
 ## Running
 
