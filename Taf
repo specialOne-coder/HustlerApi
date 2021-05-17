@@ -1,0 +1,12 @@
+Tous les dossiers
+config du serveur
+config de la bd
+creation des models
+routes
+authcontollers ( register , 
+                 authentification jwt 
+                 navigation(middleware))
+userController ( toutes les opérations de l'utilisateur );
+postRoute,postController ( toutes les opérations de l'agent );
+alerteRoute,alerteController ( les alertes du client)
+discussion (systeme de chat entre les deux parties)
