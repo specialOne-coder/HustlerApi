@@ -38,13 +38,12 @@ module.exports.createPost = async (req, res) => {
         message: req.body.message,
         service: req.body.service,
         picture: req.file != null ? "./uploads/posts/" + fileName : '',
-        video: req.body.video
     });
     try {
         const post = await newPost.save();
-        return res.status(200).json(post);
+        return res.status(200).json({ succes: true });
     } catch (error) {
-        return res.status(200).json(error);
+        return res.status(200).json({ error: error });
     }
 }
 
@@ -58,7 +57,7 @@ module.exports.updatePost = (req, res) => {
         { $set: updatedPost },
         { new: true, upsert: true, setDefaultsOnInsert: false },
         (err, docs) => {
-            if (!err) res.send(docs);
+            if (!err) res.status(200).json({ succes: true })
             else console.log('Erreur de modification ' + err);
         }
     )
@@ -70,8 +69,8 @@ module.exports.deletePost = (req, res) => {
     PostModel.findByIdAndRemove(
         req.params.id,
         (err, docs) => {
-            if (!err) return res.send(docs._id)
-            else console.log('Erreur de suppression ' + err);
+            if (!err) return res.status(200).json({ succes: true })
+            else res.status(200).json({ error: err });
         }
     )
 }

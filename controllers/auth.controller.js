@@ -18,7 +18,7 @@ module.exports.signUp = async (req, res) => {
     const { pseudo, email, userType, password } = req.body; // inputs
     try {
         const user = await UserModel.create({ pseudo, email, userType, password }); // save user
-        res.status(201).json({ user: user._id }); // renvoi de l'id de l'utilisateur inscrit
+        res.status(201).json({ success: true }); // renvoi de l'id de l'utilisateur inscrit
     } catch (err) {
         const errors = signUpErrors(err);
         res.status(200).send({ errors });
@@ -33,7 +33,7 @@ module.exports.signIn = async (req, res) => {
         const user = await UserModel.login(email, password);
         const token = createToken(user._id);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge });
-        res.status(200).json({ user: user._id });
+        res.status(200).json({ success: true });
     } catch (err) {
         const errors = signInErrors(err);
         res.status(200).send({ errors });
@@ -77,8 +77,8 @@ module.exports.sendEmailAndUpdateCode = async (req, res) => { // met a jour le m
             }
         }, { new: true, upsert: true, setDefaultsOnInsert: true },
         (err, docs) => {
-            if (!err) return res.send(docs);
-            else return res.status(200).json({ message: err })
+            if (!err) return res.status(200).json({ success: true });
+            else return res.status(200).json({ erreur: err })
         }
     );
 }
@@ -101,8 +101,8 @@ module.exports.codeVerifyAndUpdatePass = async (req, res) => { // verification d
                         }
                     }, { new: true, upsert: true, setDefaultsOnInsert: true },
                     (err, docs) => {
-                        if (!err) return res.send(docs);
-                        else return res.status(200).json({ message: err })
+                        if (!err) return res.status(200).json({ success: true });
+                        else return res.status(200).json({ error: err })
                     }
                 );
             } catch (err) {
@@ -111,9 +111,8 @@ module.exports.codeVerifyAndUpdatePass = async (req, res) => { // verification d
         } else {
             res.status(200).json({ messge: 'Code de validation incorrect' });
         }
-
     } catch (error) {
-        res.status(200).json({ message: 'Erreur ' });
+        res.status(200).json({ erreur: 'Code de validation incorrect' });
     }
 }
 

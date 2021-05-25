@@ -38,13 +38,12 @@ module.exports.createAlerte = async (req, res) => {
         message: req.body.message,
         service: req.body.service,
         picture: req.file != null ? "./uploads/posts/" + fileName : '',
-        video: req.body.video
     });
     try {
         const alerte = await newAlerte.save();
-        return res.status(200).json(alerte);
+        return res.status(200).json({ succes: true })
     } catch (error) {
-        return res.status(200).json(error);
+        return res.status(200).json({ error: error });
     }
 }
 
@@ -58,8 +57,8 @@ module.exports.updateAlerte = (req, res) => {
         { $set: updatedAlerte },
         { new: true, upsert: true, setDefaultsOnInsert: false },
         (err, docs) => {
-            if (!err) res.send(docs);
-            else console.log('Erreur de modification ' + err);
+            if (!err) res.status(200).json({ succes: true })
+            else res.status(200).json({ error: err })
         }
     )
 }
@@ -71,8 +70,8 @@ module.exports.deleteAlerte = (req, res) => {
     AlerteModel.findByIdAndRemove(
         req.params.id,
         (err, docs) => {
-            if (!err) return res.send(docs._id)
-            else console.log('Erreur de suppression ' + err);
+            if (!err) return res.status(200).json({ succes: true })
+            else res.status(200).json({ error: err })
         }
     )
 }

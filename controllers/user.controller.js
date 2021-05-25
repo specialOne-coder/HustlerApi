@@ -31,8 +31,8 @@ module.exports.updateUser = async (req, res) => {
                 }
             }, { new: true, upsert: true, setDefaultsOnInsert: true },
             (err, docs) => {
-                if (!err) return res.send(docs);
-                else return res.status(200).json({ message: err })
+                if (!err) return res.status(200).json({success:true})
+                else return res.status(200).json({ error: err })
             }
         )
     } catch (error) {
@@ -84,7 +84,7 @@ module.exports.writeMsg = async (req, res) => {
             },
             { new: true },
             (err, docs) => {
-                if (!err) return res.status(200).send(docs);
+                if (!err) return res.status(200).json({success:true});
                 else return res.status(200).send(err);
             }
         )
