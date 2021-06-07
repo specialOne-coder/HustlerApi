@@ -3,6 +3,7 @@ const bodyParser = require('body-parser'); // bodyparser pour les inputs
 const cookieParser = require('cookie-parser'); // pour l'authentification jwt
 const userRoutes = require('./routes/user.routes'); // routes des utilisateurs
 const postRoutes = require('./routes/post.routes'); // routes des posts des agents
+const adminRoutes = require('./routes/admin.routes'); // routes des posts des admins
 const alerteRoutes = require('./routes/alerte.routes'); // routes des alertes des clients
 const { checkUser, requireAuth } = require('./middleware/auth.middleware'); // middleware
 require('dotenv').config({ path: './config/.env' }); // pour gérer les variables d'environnement
@@ -35,6 +36,7 @@ app.get('/jwtid', requireAuth);
 app.use('/hustler/user', userRoutes);
 app.use('/hustler/post', postRoutes);
 app.use('/hustler/alerte',alerteRoutes);
+app.use('/hustler/admin',adminRoutes);
 
 // serveur 
 app.listen(process.env.PORT, () => {
