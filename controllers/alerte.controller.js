@@ -35,6 +35,7 @@ module.exports.createAlerte = async (req, res) => {
     }
     const newAlerte = new AlerteModel({
         alerteurId: req.body.alerteurId,
+        titre: req.body.titre,
         message: req.body.message,
         service: req.body.service,
         picture: req.file != null ? "./uploads/posts/" + fileName : '',
@@ -51,7 +52,7 @@ module.exports.createAlerte = async (req, res) => {
 // mise a jour de l'alerte
 module.exports.updateAlerte = (req, res) => {
     if (!ObjectID.isValid(req.params.id)) return res.status(400).send('ID unknow : ' + req.params.id);
-    const updatedAlerte = { message: req.body.message, service: req.body.service, status: req.body.status }
+    const updatedAlerte = { titre: req.body.titre,message: req.body.message, service: req.body.service, status: req.body.status }
     AlerteModel.findByIdAndUpdate(
         req.params.id,
         { $set: updatedAlerte },

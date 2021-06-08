@@ -7,6 +7,11 @@ const alerteSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    titre: {
+        type: String,
+        trim: true,
+        required: true,
+    },
     message: {
         type: String,
         trim: true,
