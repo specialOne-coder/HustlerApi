@@ -22,11 +22,39 @@ const alerteSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    dateAjout:{
+        type:Date,
+        default:Date.now,
+    },
+    dateTaf:{
+        type:String,
+        required:true,
+    },
     picture: {
         type: String,
     },
     position: {
         type: String,
+        required:true,
+    },
+    offersNumber:{
+        type:Number
+    },
+    offres: {
+        type: [
+            {
+                id:String,
+                nom: String,
+                email: String,
+                bio:String,
+                timestamps: Number
+            }
+        ],
+        required: true,
+    },
+    prix:{
+        type:String,
+        required:true,
     },
     status: {
         type: String,

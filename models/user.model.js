@@ -46,6 +46,16 @@ const userSchema = new mongoose.Schema(
             ],
             required: true,
         },
+        activities: {
+            type: [
+                {
+                    activity: String,
+                    others: String,
+                    timestamps: Number
+                }
+            ],
+            required: true,
+        },
         phone: {
             type: String,
         },

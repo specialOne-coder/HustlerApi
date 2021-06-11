@@ -8,6 +8,7 @@ router.get('/',alerteController.readAlerte);
 router.post('/create',upload.single('file'),alerteController.createAlerte);
 router.put('/update/:id',alerteController.updateAlerte);
 router.delete('/delete/:id',alerteController.deleteAlerte);
+router.patch('/doOffer/:id',alerteController.doOffer);
 
 
 module.exports = router;

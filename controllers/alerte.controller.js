@@ -38,6 +38,9 @@ module.exports.createAlerte = async (req, res) => {
         titre: req.body.titre,
         message: req.body.message,
         service: req.body.service,
+        dateTaf:req.body.dateTaf,
+        position:req.body.position,
+        prix:req.body.prix,
         picture: req.file != null ? "./uploads/posts/" + fileName : '',
     });
     try {
@@ -75,4 +78,46 @@ module.exports.deleteAlerte = (req, res) => {
             else res.status(200).json({ error: err })
         }
     )
+}
+
+// Mise a jour de l'alerte apres offre
+module.exports.doOffer = async (req, res) => {
+    if (!ObjectID.isValid(req.params.id)) return res.status(400).send('ID unknow : ' + req.params.id);
+    try {
+        await AlerteModel.findByIdAndUpdate(
+            req.params.id,
+            {
+                $addToSet: {
+                    offres: {
+                        id:req.body.id,
+                        nom: req.body.name,
+                        email: req.body.id,
+                        bio: req.body.bio,
+                    },
+                }
+            },
+            { new: true },
+            (err, docs) => {
+                if (err) return res.status(200).send(err);
+            }
+        );
+        await UserModel.findByIdAndUpdate(
+            req.body.id,
+            {
+                $addToSet: {
+                    activities: {
+                        activity: req.params.id,
+                        others:'hum',
+                    },
+                }
+            },
+            { new: true },
+            (err, docs) => {
+                if (!err) return res.status(200).json({ success: true });
+                else return res.status(200).send(err);
+            }
+        )
+    } catch (error) {
+        return res.status(200).send(err);
+    }
 }
