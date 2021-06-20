@@ -91,8 +91,6 @@ module.exports.doOffer = async (req, res) => {
                     offres: {
                         id:req.body.id,
                         nom: req.body.name,
-                        email: req.body.id,
-                        bio: req.body.bio,
                     },
                 }
             },

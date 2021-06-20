@@ -45,8 +45,6 @@ const alerteSchema = mongoose.Schema({
             {
                 id:String,
                 nom: String,
-                email: String,
-                bio:String,
                 timestamps: Number
             }
         ],

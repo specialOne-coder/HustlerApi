@@ -22,6 +22,10 @@ const postSchema = mongoose.Schema(
         video: {
             type: String,
         },
+        position:{
+            type:String,
+            required:true,
+        }
     },
     {
         timestamps:true,

@@ -37,6 +37,7 @@ module.exports.createPost = async (req, res) => {
         posterId: req.body.posterId,
         message: req.body.message,
         service: req.body.service,
+        position:req.body.position,
         picture: req.file != null ? "./uploads/posts/" + fileName : '',
     });
     try {
