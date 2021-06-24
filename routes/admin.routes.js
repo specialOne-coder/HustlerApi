@@ -13,5 +13,6 @@ router.put('/updatePass',adminController.codeVerifyAndUpdatePass);
 router.get('/',adminController.allUsers);
 router.get('/:id',adminController.userInfo);
 router.delete('/delete/:id',adminController.deleteUser);
+//router.put('/addcomp/:id',adminController.addCompetences);
 
 module.exports = router;

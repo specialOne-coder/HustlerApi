@@ -56,6 +56,16 @@ const userSchema = new mongoose.Schema(
             ],
             required: true,
         },
+        competences: {
+            type: [
+                {
+                    name: String,
+                    niveau: String,
+                    timestamps: Number
+                }
+            ],
+            required: true,
+        },
         phone: {
             type: String,
         },
@@ -68,7 +78,13 @@ const userSchema = new mongoose.Schema(
         },
         adresse: {
             type: String,
-        }
+        },
+        genre: {
+            type: String,
+        },
+        Dnaissance: {
+            type: Date,
+        },
     },
     {
         timestamps: true,
