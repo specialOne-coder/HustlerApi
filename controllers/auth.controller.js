@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken'); // jwt
 const maxAge = 3 * 24 * 60 * 1000; // cookie life
 const bcrypt = require('bcrypt'); // cryptage du mot de passe modifié
 const nodemailer = require('nodemailer'); // envoi de mail
+const { mailConfirmation } = require('./html/mailConfirmation');
+const { mailForget } = require('./html/mailForget');
 
 
 // jwt token creation function
@@ -18,14 +20,97 @@ module.exports.signUp = async (req, res) => {
     const { pseudo, email, userType, password } = req.body; // inputs
     try {
         const user = await UserModel.create({ pseudo, email, userType, password }); // save user
-        res.status(201).json({ success: true }); // renvoi de l'id de l'utilisateur inscrit
+        const codeVerif = Math.floor(100000 + Math.random() * 900000);
+        if (user) {
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'frdndattivi@gmail.com',
+                    pass: 'ferdinand8918',
+                }
+            });
+            var mailOptions = {
+                from: 'frdndattivi@gmail.com',
+                to: String(user.email),
+                subject: 'Mail de confirmation',
+                text: String(codeVerif),
+                html: mailConfirmation(codeVerif)
+            };
+            transporter.sendMail(mailOptions, async (err, info) => {
+                if (err) {
+                    //return res.status(200).json({ message: "le mail n'a pu etre envoyé" });
+                    console.log("Erreur d'envoi du mail : " + err.message);
+                    return res.status(200).json({ success: false, message: "le mail n'a pu etre envoye" })
+                } else {
+                    //console.log('Modif en cours');
+                    await UserModel.findOneAndUpdate(
+                        { _id: user._id },
+                        {
+                            $set: {
+                                verifiedCode: codeVerif,
+                            }
+                        }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                        (err, docs) => {
+                            if (!err) console.log(docs);
+                            else console.log(err);
+                        }
+                    );
+                    res.status(200).json({ success: true, message: "Mail envoye" })
+                }
+            });
+        }
     } catch (err) {
         const errors = signUpErrors(err);
         res.status(200).send({ errors });
-        //console.log(err);
+        console.log("Autre erreur : " + err);
     }
 }
 
+
+// Renvoyer confirmation mail
+module.exports.resend = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await UserModel.searchWithEmail(email);
+        const codeVerif = Math.floor(100000 + Math.random() * 900000);
+        if (user) {
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'frdndattivi@gmail.com',
+                    pass: 'ferdinand8918',
+                }
+            });
+            var mailOptions = {
+                from: 'frdndattivi@gmail.com',
+                to: String(user.email),
+                subject: 'Mail de confirmation',
+                html: mailConfirmation(codeVerif)
+            };
+            transporter.sendMail(mailOptions, async (err, info) => {
+                if (err) {
+                    return res.status(200).json({ success: false, message: "le mail n'a pu etre envoye" })
+                } else {
+                    await UserModel.findOneAndUpdate(
+                        { _id: user._id },
+                        {
+                            $set: {
+                                verifiedCode: codeVerif,
+                            }
+                        }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                        (err, docs) => {
+                            if (!err) console.log(docs);
+                            else console.log(err);
+                        }
+                    );
+                    res.status(200).json({ success: true, message: "Mail envoye" })
+                }
+            });
+        }
+    } catch (error) {
+        res.status(200).json({ success: false });
+    }
+}
 // connexion
 module.exports.signIn = async (req, res) => {
     const { email, password } = req.body;
@@ -40,82 +125,93 @@ module.exports.signIn = async (req, res) => {
     }
 }
 
+
+
 // mot de passe oublié
-
-const sendEmail = (email, code) => { // envoi un email 
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'frdndattivi@gmail.com',
-            pass: 'ferdinand8918',
-        }
-    });
-
-    var mailOptions = {
-        from: 'frdndattivi@gmail.com',
-        to: email,
-        subject: 'Mot de passe oublié',
-        text: code,
-    };
-    transporter.sendMail(mailOptions, (err, info) => {
-        if (err) console.log(err);
-        else console.log('Email envoyé ' + info.response);
-    })
-}
-
 module.exports.sendEmailAndUpdateCode = async (req, res) => { // met a jour le mot code apres envoi du mail
 
     const { email } = req.body;
-    const user = await UserModel.forgetPasswordWithEmail(email);
-    const codeSend = Math.floor(100000 + Math.random() * 900000);
-    await sendEmail(String(email), String(codeSend));
-    await UserModel.findOneAndUpdate(
-        { _id: user._id },
-        {
-            $set: {
-                code: codeSend,
-            }
-        }, { new: true, upsert: true, setDefaultsOnInsert: true },
-        (err, docs) => {
-            if (!err) return res.status(200).json({ success: true });
-            else return res.status(200).json({ erreur: err })
-        }
-    );
-}
-
-module.exports.codeVerifyAndUpdatePass = async (req, res) => { // verification du code et mise a jour du mot de passe
-    const { codeI, newPassword } = req.body;
-    const user = await UserModel.forgetPasswordWithCode(codeI);
-    let pass = String(newPassword);
-    const salt = await bcrypt.genSalt();
-    pass = await bcrypt.hash(pass, salt);
     try {
-        if (codeI == user.code) {
-
-            try {
-                await UserModel.findOneAndUpdate(
-                    { _id: user._id },
-                    {
-                        $set: {
-                            password: pass,
+        const user = await UserModel.searchWithEmail(email);
+        const codeVerif = Math.floor(100000 + Math.random() * 900000);
+        if (user) {
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'frdndattivi@gmail.com',
+                    pass: 'ferdinand8918',
+                }
+            });
+            var mailOptions = {
+                from: 'frdndattivi@gmail.com',
+                to: String(user.email),
+                subject: 'Forget password',
+                text: String(codeVerif),
+                html: mailForget(user.pseudo, codeVerif)
+            };
+            transporter.sendMail(mailOptions, async (err, info) => {
+                if (err) {
+                    return res.status(200).json({ success: false, message: "le mail n'a pu etre envoye" })
+                } else {
+                    await UserModel.findOneAndUpdate(
+                        { _id: user._id },
+                        {
+                            $set: {
+                                forgetCode: codeVerif,
+                            }
+                        }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                        (err, docs) => {
+                            if (!err) console.log(docs);
+                            else console.log(err);
                         }
-                    }, { new: true, upsert: true, setDefaultsOnInsert: true },
-                    (err, docs) => {
-                        if (!err) return res.status(200).json({ success: true });
-                        else return res.status(200).json({ error: err })
-                    }
-                );
-            } catch (err) {
-                res.status(200).send({ err });
-            }
-        } else {
-            res.status(200).json({ messge: 'Code de validation incorrect' });
+                    );
+                    res.status(200).json({ success: true, message: "Mail envoye" })
+                }
+            });
         }
     } catch (error) {
-        res.status(200).json({ erreur: 'Code de validation incorrect' });
+        res.status(200).json({ success: false, messsage: 'Email incorrect' })
     }
 }
 
+module.exports.codeVerifyAndUpdatePass = async (req, res) => { // verification du code et mise a jour du mot de passe
+    const { forgetCode, newPassword } = req.body;
+    try {
+        const user = await UserModel.searchWithCode(forgetCode);
+        let pass = String(newPassword);
+        const salt = await bcrypt.genSalt();
+        pass = await bcrypt.hash(pass, salt);
+        try {
+            if (forgetCode == user.forgetCode) {
+
+                try {
+                    await UserModel.findOneAndUpdate(
+                        { _id: user._id },
+                        {
+                            $set: {
+                                password: pass,
+                            }
+                        }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                        (err, docs) => {
+                            if (!err) return res.status(200).json({ success: true, message: 'Modification reussie' });
+                            else return res.status(200).json({ success: false, message: "Erreur de modifiacation , réessayer" })
+                        }
+                    );
+                } catch (err) {
+                    res.status(200).send({ err });
+                }
+            } else {
+                res.status(200).json({ success: false, messge: 'Code de validation incorrect' });
+            }
+
+        } catch (error) {
+            res.status(200).send({ message: error });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+}
 
 // deconnexion
 module.exports.logout = (req, res) => {

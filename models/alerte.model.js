@@ -45,7 +45,6 @@ const alerteSchema = mongoose.Schema({
             {
                 id:String,
                 nom: String,
-                timestamps: Number
             }
         ],
         required: true,

@@ -6,6 +6,7 @@ const uplad = multer();
 
 // authentification
 router.post('/register', authController.signUp);
+router.post('/resend',authController.resend);
 router.post('/login', authController.signIn);
 router.get('/logout', authController.logout);
 router.put('/forget',authController.sendEmailAndUpdateCode);

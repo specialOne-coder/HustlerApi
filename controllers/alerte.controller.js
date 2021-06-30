@@ -1,4 +1,5 @@
 const AlerteModel = require('../models/alerte.model');
+const UserModel = require('../models/user.model');
 const { uploadErrors } = require('../utils/error.utils');
 const ObjectID = require('mongoose').Types.ObjectId;
 const fs = require('fs');
@@ -116,6 +117,7 @@ module.exports.doOffer = async (req, res) => {
             }
         )
     } catch (error) {
-        return res.status(200).send(err);
+        return res.status(200).send(error);
+        console.log(error);
     }
 }

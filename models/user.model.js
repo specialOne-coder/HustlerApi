@@ -85,6 +85,12 @@ const userSchema = new mongoose.Schema(
         Dnaissance: {
             type: Date,
         },
+        verifiedCode: {
+            type: String,
+        },
+        forgetCode: {
+            type: String,
+        },
     },
     {
         timestamps: true,
@@ -113,21 +119,21 @@ userSchema.statics.login = async function (email, password) {
 }
 
 // mot de passe oublié , recherche par email pour lui envoyer un code
-userSchema.statics.forgetPasswordWithEmail = async function (email) {
+userSchema.statics.searchWithEmail = async function (email) {
     const user = await this.findOne({ email });
     if (user) {
         return user;
     }
-    throw Error('Cet email n\'existe pas');
+    console.log('Cet email n\'existe pas');
 }
 
 // mot de passe oublié , recherche par code pour lui donner la main de modifier le mot de passe
-userSchema.statics.forgetPasswordWithCode = async function (code) {
-    const user = await this.findOne({ code });
+userSchema.statics.searchWithCode = async function (forgetCode) {
+    const user = await this.findOne({ forgetCode });
     if (user) {
         return user;
     }
-    console.log('Code de validation incorrect');
+    return 'Erreur de puis le model';
 }
 
 
