@@ -29,8 +29,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // jwt
 app.use(cookieParser());
-app.get('*', checkUser);
-app.get('/jwtid', requireAuth);
+//app.get('*', checkUser);
+//app.get('/jwtid', requireAuth);
 
 // routes 
 app.use('/hustler/user', userRoutes);

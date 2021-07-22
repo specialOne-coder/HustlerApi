@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
         },
         pictures: {
             type: String,
-            default: "./uploads/profil/avatar.png"
+            default: ""
         },
         userType: {
             type: String,
@@ -68,22 +68,31 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
+            default: ""
         },
         code: {
             type: String,
         },
         bio: {
             type: String,
-            max: 1024
+            max: 1024,
+            default: ""
         },
         adresse: {
             type: String,
+            default: ""
+        },
+        verified:{
+            type:String,
+            default: ""
         },
         genre: {
             type: String,
+            default: ""
         },
         Dnaissance: {
-            type: Date,
+            type: String,
+            default: ""
         },
         verifiedCode: {
             type: String,
@@ -124,17 +133,27 @@ userSchema.statics.searchWithEmail = async function (email) {
     if (user) {
         return user;
     }
-    console.log('Cet email n\'existe pas');
+    throw Error('Invalid email');
 }
 
 // mot de passe oublié , recherche par code pour lui donner la main de modifier le mot de passe
-userSchema.statics.searchWithCode = async function (forgetCode) {
+userSchema.statics.forgetCode = async function (forgetCode) {
     const user = await this.findOne({ forgetCode });
     if (user) {
         return user;
     }
-    return 'Erreur de puis le model';
+    throw Error('Code incorrect');
 }
+
+// verified code
+userSchema.statics.verifiedCode = async function (verifiedCode) {
+    const user = await this.findOne({ verifiedCode });
+    if (user) {
+        return user;
+    }
+    throw Error('Code incorrect');
+}
+
 
 
 

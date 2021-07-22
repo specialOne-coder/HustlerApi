@@ -7,7 +7,6 @@ const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline);
 
 
-
 // lecture des alertes
 module.exports.readAlerte = (req, res) => {
     AlerteModel.find((err, docs) => {

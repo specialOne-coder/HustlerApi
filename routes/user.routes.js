@@ -4,12 +4,15 @@ const userController = require('../controllers/user.controller'); // user contro
 const multer = require('multer');
 const uplad = multer();
 
+
 // authentification
 router.post('/register', authController.signUp);
+router.put('/verified',authController.verified);
 router.post('/resend',authController.resend);
 router.post('/login', authController.signIn);
 router.get('/logout', authController.logout);
 router.put('/forget',authController.sendEmailAndUpdateCode);
+router.post('/resendForget',authController.resendForgetCode);
 router.put('/updatePass',authController.codeVerifyAndUpdatePass);
 
 // others

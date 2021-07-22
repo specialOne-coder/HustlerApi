@@ -15,7 +15,7 @@ module.exports.allUsers = async (req, res) => {
 module.exports.userInfo = async (req, res) => {
     (!ObjectID.isValid(req.params.id)) ? res.status(400).send('ID unknow : ' + req.params.id)
         : UserModel.findById(req.params.id, (err, docs) => {
-            if (!err) res.send(docs)
+            if (!err) res.status(200).json(docs)
             else console.log('ID unknow :' + err);
         }).select('-password');
 }
