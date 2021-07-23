@@ -3,6 +3,7 @@ const ObjectID = require('mongoose').Types.ObjectId; // pour les ids
 const fs = require('fs');
 const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline)
+const { updateErrors } = require('../utils/error.utils'); 
 
 
 // les infos de tous les utilisateurs sauf le password
@@ -28,18 +29,23 @@ module.exports.updateUser = async (req, res) => {
             { _id: req.params.id },
             {
                 $set: {
+                    pseudo:req.body.pseudo,
+                    name:req.body.name,
                     bio: req.body.bio,
                     phone: req.body.phone,
-                    adresse: req.body.adresse
+                    adresse: req.body.adresse,
+                    pictures:req.body.pictures,
+                    genre: req.body.genre,
+                    Dnaissance: req.body.Dnaissance,
                 }
             }, { new: true, upsert: true, setDefaultsOnInsert: true },
             (err, docs) => {
-                if (!err) return res.status(200).json({ success: true })
-                else return res.status(200).json({ error: err })
+                if (!err) return res.status(200).json({ success: true });
             }
         )
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        const errors = updateErrors(err);
+        res.status(300).json(errors);
     }
 }
 
@@ -111,7 +117,7 @@ module.exports.uploadProfil = async (req, res) => {
     try {
         await UserModel.findByIdAndUpdate(
             { _id: req.body.userId },
-            { $set: { pictures: "./uploads/profil/" + fileName } },
+            { $set: { pictures: fileName } },
             { new: true, upsert: true, setDefaultsOnInsert: true },
             (err, docs) => {
                 if (!err) return res.send(docs);

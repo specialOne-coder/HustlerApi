@@ -17,6 +17,29 @@ module.exports.signUpErrors = (err) => {
     return errors;
 }
 
+module.exports.updateErrors = (err) => {
+    let errors = { pseudo: '',email: '',  name: '',phone: '' };
+    if (err.message.includes('pseudo')) errors.pseudo = "Pseudo incorrect , chosissez bien votre pseudo";
+
+    if (err.message.includes("email")) errors.email = "Email incorrect";
+
+    if (err.message.includes("name")) errors.name = "Nom incorrect";
+
+    if (err.message.includes("phone")) errors.name = "Incorrect phone number";
+
+
+    if (err.code === 11000 && Object.keys(err.keyValue)[0].includes("pseudo"))
+        errors.pseudo = "Ce nom d'utilisateur existe déja ";
+
+    if (err.code === 11000 && Object.keys(err.keyValue)[0].includes("email"))
+        errors.email = "Ce email existe déja";
+
+    if (err.code === 11000 && Object.keys(err.keyValue)[0].includes("phone"))
+        errors.email = "Ce email existe déja";
+
+    return errors;
+}
+
 // Gestion des erreurs de connexion
 module.exports.signInErrors = (err) => {
     let errors = { email: '', password: '' };

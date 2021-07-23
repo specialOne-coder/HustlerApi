@@ -11,6 +11,13 @@ const userSchema = new mongoose.Schema(
             minLength: 3,
             maxLength: 25,
             unique: true,
+            trim: true,
+        },
+        name: {
+            type: String,
+            required: true,
+            minLength: 3,
+            maxLength: 25,
             trim: true
         },
         email: {
@@ -68,6 +75,8 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
+            unique: true,
+            trim: true,
             default: ""
         },
         code: {

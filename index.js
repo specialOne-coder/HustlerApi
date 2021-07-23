@@ -33,10 +33,14 @@ app.use(cookieParser());
 //app.get('/jwtid', requireAuth);
 
 // routes 
+app.use('/profilPic',express.static('uploads/profil'));
+app.use('/alertePic',express.static('uploads/alertes'));
+app.use('/postPic',express.static('uploads/posts'));
 app.use('/hustler/user', userRoutes);
 app.use('/hustler/post', postRoutes);
 app.use('/hustler/alerte',alerteRoutes);
 app.use('/hustler/admin',adminRoutes);
+
 
 // serveur 
 app.listen(process.env.PORT, () => {
