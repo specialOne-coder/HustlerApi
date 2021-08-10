@@ -91,13 +91,13 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: ""
         },
-        verified:{
-            type:String,
+        verified: {
+            type: String,
             default: ""
         },
         genre: {
             type: String,
-            default: ""
+            default: "Non Spécifié"
         },
         Dnaissance: {
             type: String,
@@ -136,6 +136,20 @@ userSchema.statics.login = async function (email, password) {
     throw Error('Incorrect email');
 }
 
+// Mise à jour volontaire du mot de passe , recherche si le password existe
+userSchema.statics.verifyPass = async function (email, password) {
+    const user = await this.findOne({ email }); //recherche de l'utilisateur par email
+    if (user) {
+        const verify = await bcrypt.compare(password, user.password);
+        console.log('pass :' + verify);
+        if (verify) {
+            return user;
+        }
+    throw Error('Incorrect password');
+    }
+    throw Error('Not user');
+}
+
 // mot de passe oublié , recherche par email pour lui envoyer un code
 userSchema.statics.searchWithEmail = async function (email) {
     const user = await this.findOne({ email });
@@ -162,6 +176,8 @@ userSchema.statics.verifiedCode = async function (verifiedCode) {
     }
     throw Error('Code incorrect');
 }
+
+
 
 
 

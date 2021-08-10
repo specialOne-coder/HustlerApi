@@ -133,7 +133,6 @@ module.exports.verified = async (req, res) => { // verification du code et mise 
                 res.status(500).send({ err });
             }
         } else {
-            log
             res.status(400).json({ success: false, messge: 'Erreur 400 Code de validation incorrect' });
         }
     } catch (error) {

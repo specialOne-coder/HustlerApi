@@ -8,12 +8,15 @@ const uplad = multer();
 // authentification
 router.post('/register', authController.signUp);
 router.put('/verified', authController.verified);
+router.put('/newEmailCode',userController.newEmailCode);
+router.put('/updateEmail',userController.updateEmail);
 router.post('/resend', authController.resend);
 router.post('/login', authController.signIn);
 router.get('/logout', authController.logout);
 router.put('/forget', authController.sendEmailAndUpdateCode);
 router.post('/resendForget', authController.resendForgetCode);
 router.put('/updatePass', authController.codeVerifyAndUpdatePass);
+router.put('/modifyPass', userController.modifyPass);
 
 // others
 router.get('/', userController.allUsers);

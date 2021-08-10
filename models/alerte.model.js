@@ -45,6 +45,7 @@ const alerteSchema = mongoose.Schema({
             {
                 id:String,
                 nom: String,
+                picture:String,
             }
         ],
         required: true,
@@ -64,5 +65,6 @@ const alerteSchema = mongoose.Schema({
         timestamp: true,
     }
 );
+
 
 module.exports = mongoose.model('alerte',alerteSchema);

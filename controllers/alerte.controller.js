@@ -10,9 +10,18 @@ const pipeline = promisify(require('stream').pipeline);
 // lecture des alertes
 module.exports.readAlerte = (req, res) => {
     AlerteModel.find((err, docs) => {
-        if (!err) return res.send(docs);
+        if (!err)  return res.status(200).json(docs)
         else console.log('Erreur de recuperation ' + err);
-    }).sort({ createdAt: -1 });
+    }).sort({ "createdAt": -1 });
+}
+
+// infos sur une alerte
+module.exports.alerteInfos = async (req, res) => {
+    (!ObjectID.isValid(req.params.id)) ? res.status(400).send('ID unknow : ' + req.params.id)
+        : AlerteModel.findById(req.params.id, (err, docs) => {
+            if (!err) res.status(200).json(docs)
+            else console.log('ID unknow :' + err);
+        });
 }
 
 // alerte d'un client
@@ -41,7 +50,7 @@ module.exports.createAlerte = async (req, res) => {
         dateTaf:req.body.dateTaf,
         position:req.body.position,
         prix:req.body.prix,
-        picture: req.file != null ? "./uploads/posts/" + fileName : '',
+        picture: req.file != null ? fileName : '',
     });
     try {
         const alerte = await newAlerte.save();
@@ -84,6 +93,7 @@ module.exports.deleteAlerte = (req, res) => {
 module.exports.doOffer = async (req, res) => {
     if (!ObjectID.isValid(req.params.id)) return res.status(400).send('ID unknow : ' + req.params.id);
     try {
+        let nbreOffres = AlerteModel.find({'offres':1}).countDocuments();
         await AlerteModel.findByIdAndUpdate(
             req.params.id,
             {
@@ -91,7 +101,9 @@ module.exports.doOffer = async (req, res) => {
                     offres: {
                         id:req.body.id,
                         nom: req.body.name,
+                        picture:req.body.picture
                     },
+                    offersNumber: nbreOffres
                 }
             },
             { new: true },
@@ -119,4 +131,5 @@ module.exports.doOffer = async (req, res) => {
         return res.status(200).send(error);
         console.log(error);
     }
+
 }

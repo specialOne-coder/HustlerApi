@@ -2,8 +2,10 @@ const UserModel = require('../models/user.model'); // user model
 const ObjectID = require('mongoose').Types.ObjectId; // pour les ids
 const fs = require('fs');
 const { promisify } = require('util');
+const bcrypt = require('bcrypt'); // cryptage du mot de passe modifié
+const nodemailer = require('nodemailer'); // envoi de mai
 const pipeline = promisify(require('stream').pipeline)
-const { updateErrors } = require('../utils/error.utils'); 
+const { updateErrors } = require('../utils/error.utils');
 
 
 // les infos de tous les utilisateurs sauf le password
@@ -29,12 +31,12 @@ module.exports.updateUser = async (req, res) => {
             { _id: req.params.id },
             {
                 $set: {
-                    pseudo:req.body.pseudo,
-                    name:req.body.name,
+                    pseudo: req.body.pseudo,
+                    name: req.body.name,
                     bio: req.body.bio,
                     phone: req.body.phone,
                     adresse: req.body.adresse,
-                    pictures:req.body.pictures,
+                    pictures: req.body.pictures,
                     genre: req.body.genre,
                     Dnaissance: req.body.Dnaissance,
                 }
@@ -46,6 +48,122 @@ module.exports.updateUser = async (req, res) => {
     } catch (err) {
         const errors = updateErrors(err);
         res.status(300).json(errors);
+    }
+}
+
+// update Email Sending code
+module.exports.newEmailCode = async (req, res) => { // met a jour le mot code apres envoi du mail
+
+    const { email } = req.body;
+    try {
+        const user = await UserModel.searchWithEmail(email);
+        const codeVerif = Math.floor(100000 + Math.random() * 900000);
+        if (user) {
+            res.status(400).send({ message: 'Cet email existe déja' })
+        } else {
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'frdndattivi@gmail.com',
+                    pass: 'ferdinand8918',
+                }
+            });
+            var mailOptions = {
+                from: 'frdndattivi@gmail.com',
+                to: String(user.email),
+                subject: 'Mise à jour de votre email',
+                text: String(codeVerif),
+                html: mailConfirmation(user.pseudo, codeVerif)
+            };
+            transporter.sendMail(mailOptions, async (err, info) => {
+                if (err) {
+                    return res.status(500).json({ success: false, message: "le mail n'a pu etre envoye" })
+                } else {
+                    await UserModel.findOneAndUpdate(
+                        { _id: user._id },
+                        {
+                            $set: {
+                                verifiedCode: codeVerif,
+                            }
+                        }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                        (err, docs) => {
+                            if (!err);
+                            else console.log(err);
+                        }
+
+                    );
+                    res.status(200).json({ success: true, message: "Mail envoye" });
+                }
+            });
+        }
+    } catch (error) {
+        res.status(300).json({ success: false, messsage: 'Email incorrect : ' + error });
+    }
+}
+
+// update Email 
+
+module.exports.updateEmail = async (req, res) => { // verification du code et mise a jour du mot de passe
+    const { verifiedCode, newEmail } = req.body;
+    try {
+        const user = await UserModel.verifiedCode(verifiedCode);
+        if (verifiedCode == user.verifiedCode) {
+            try {
+                await UserModel.findOneAndUpdate(
+                    { _id: user._id },
+                    {
+                        $set: {
+                            verified: 'oui',
+                            email: newEmail
+                        }
+                    }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                    (err, docs) => {
+                        if (!err) return res.status(200).json({ success: true, message: 'Modification reussie' });
+                        else console.log(err);
+                    }
+                );
+            } catch (err) {
+                res.status(500).send({ err });
+            }
+        } else {
+            res.status(400).json({ success: false, messge: 'Erreur 400 Code de validation incorrect' });
+        }
+    } catch (error) {
+        res.status(300).json({ success: false, message: error });
+    }
+}
+
+// Mise a jour du password
+module.exports.modifyPass = async (req, res) => { // verification du code et mise a jour du mot de passe
+    const { email, oldPass, newPass } = req.body;
+    try {
+        const passwordVerify = await UserModel.verifyPass(email, oldPass);
+        let pass = String(newPass);
+        const salt = await bcrypt.genSalt();
+        pass = await bcrypt.hash(pass, salt);
+        if (passwordVerify) {
+            try {
+                await UserModel.findOneAndUpdate(
+                    { _id: passwordVerify._id },
+                    {
+                        $set: {
+                            password: pass,
+                        }
+                    }, { new: true, upsert: true, setDefaultsOnInsert: true },
+                    (err, docs) => {
+                        if (!err) return res.status(200).json({ success: true, message: 'Modification reussie' });
+                        else console.log(err);
+                    }
+                );
+            } catch (err) {
+                res.status(500).send({ err });
+            }
+        } else {
+            res.status(400).json({ success: false, messge: 'Erreur 400 Code de validation incorrect' });
+        }
+    } catch (error) {
+        res.status(300).json({ success: false, message: error });
+        console.log(error);
     }
 }
 
@@ -125,7 +243,7 @@ module.exports.uploadProfil = async (req, res) => {
             }
         )
     } catch (error) {
-        return res.status(201).json({ message : error })
+        return res.status(201).json({ message: error })
         console.log(error);
     }
 
