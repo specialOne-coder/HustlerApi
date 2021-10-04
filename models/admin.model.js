@@ -75,7 +75,6 @@ adminSchema.statics.forgetPasswordWithCode = async function (code) {
     console.log('Code de validation incorrect');
 }
 
-
 const AdminModel = mongoose.model('admin', adminSchema); // creation du modèle dans la bdd
 
 module.exports = AdminModel;

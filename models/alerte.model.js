@@ -66,5 +66,4 @@ const alerteSchema = mongoose.Schema({
     }
 );
 
-
 module.exports = mongoose.model('alerte',alerteSchema);

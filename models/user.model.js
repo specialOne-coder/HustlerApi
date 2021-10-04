@@ -178,10 +178,6 @@ userSchema.statics.verifiedCode = async function (verifiedCode) {
 }
 
 
-
-
-
-
 const UserModel = mongoose.model('user', userSchema); // creation du modèle dans la bdd
 
 module.exports = UserModel;

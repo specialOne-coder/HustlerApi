@@ -17,7 +17,7 @@ module.exports.signUpErrors = (err) => {
     return errors;
 }
 
-module.exports.updateErrors = (err) => {
+module.exports.uploadErrors = (err) => {
     let errors = { pseudo: '',email: '',  name: '',phone: '' };
     if (err.message.includes('pseudo')) errors.pseudo = "Pseudo incorrect , chosissez bien votre pseudo";
 
@@ -53,7 +53,7 @@ module.exports.signInErrors = (err) => {
 }
 
 // Gestion des erreurs d'upload de fichier
-module.exports.uploadErrors = (err) => {
+module.exports.uploadErrorss = (err) => {
     let errors = { format: '', maxSize: "" };
 
     if (err.message.includes("invalid file")) errors.format = "Format incompatible";

@@ -5,7 +5,7 @@ const { promisify } = require('util');
 const bcrypt = require('bcrypt'); // cryptage du mot de passe modifié
 const nodemailer = require('nodemailer'); // envoi de mai
 const pipeline = promisify(require('stream').pipeline)
-const { updateErrors } = require('../utils/error.utils');
+const { uploadErrors,uploadErrorss } = require('../utils/error.utils');
 
 
 // les infos de tous les utilisateurs sauf le password
@@ -219,8 +219,9 @@ module.exports.uploadProfil = async (req, res) => {
             throw Error("invalid file");
         if (req.file.size > 500000) throw Error("max size : 50mo");
     } catch (error) {
-        const errors = uploadErrors(error);
-        return res.status(201).json({ errors });
+        const errors = uploadErrorss(error);
+        console.log(errors);
+        return res.status(301).json({ errors });
     }
 
     const fileName = req.body.name + ".jpg";

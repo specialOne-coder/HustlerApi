@@ -11,7 +11,6 @@ require('./config/db.config'); // import de la configuration du db
 const cors = require('cors'); // autorisation d'un programme tier
 const app = express(); // main app
 
-
 // cors 
 const corsOptions = {
     origin:process.env.CLIENT_URL,
